@@ -17,7 +17,6 @@ import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,14 +24,22 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.twinc.halmato.lottogo.model.Draw;
+import com.twinc.halmato.lottogo.model.Draws;
 
 import java.io.IOException;
+
 
 public class ViewPagerActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
         ViewPagerItemFragment.FragmentPagerItemCallback, ViewPagerItemFragment.SurfaceViewFragmentSetupCompletedCallback
 {
-
+    private static final String BASE_JSON_OBJECT_KEY = "base";
     final String TAG = "ViewPagerActivity";
     final int REQUEST_CAMERA_PERMISSION_ID = 1001;
 
@@ -46,10 +53,10 @@ public class ViewPagerActivity extends AppCompatActivity implements TabLayout.On
 
     private static final String[] pageTitles = {"CAMERA", "Music", "Podcasts", "Other"};
 
+    private DatabaseReference db;
 
     private void findViews()
     {
-        Log.w(TAG, "findViews: Hi" );
         tabLayout = (TabLayout) findViewById(R.id.tbl_main_content);
         pager = (ViewPager) findViewById(R.id.vpg_main_content);
     }
@@ -58,21 +65,32 @@ public class ViewPagerActivity extends AppCompatActivity implements TabLayout.On
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         switch (requestCode) {
+
             case REQUEST_CAMERA_PERMISSION_ID: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    if(ActivityCompat.checkSelfPermission(this,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-
-                    try {
-                        cameraSource.start(cameraSurfaceView.getHolder());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                startCamera(grantResults[0]);
             }
         }
+    }
+
+    private void startCamera(int grantResult)
+    {
+        if (requestIsGranted(grantResult)) {
+
+            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+
+            try {
+                cameraSource.start(cameraSurfaceView.getHolder());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private boolean requestIsGranted(int grantResult)
+    {
+        return grantResult == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -81,14 +99,56 @@ public class ViewPagerActivity extends AppCompatActivity implements TabLayout.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_pager);
 
+        connectToDatabase();
+        readFromDatabase();
+
         getSupportActionBar().setElevation(0f);
 
         findViews();
 
-
         setUpPagerAndTabs();
+    }
+
+    private void readFromDatabase() {
+
+        db.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Gson gson = new Gson();
+                Toast.makeText(ViewPagerActivity.this, dataSnapshot.getValue().toString(), Toast.LENGTH_LONG).show();
+                Draws d = gson.fromJson(dataSnapshot.toString(),Draws.class);
+                /*for (Draw draw:draws.getDraws()) {
+                    Toast.makeText(ViewPagerActivity.this, "Date: "+draw.getDate(), Toast.LENGTH_SHORT).show();
+                }*/
+
+                /*
+                working
+                for (DataSnapshot draw:dataSnapshot.getChildren()) {
 
 
+                    Draw d = gson.fromJson(draw.getValue().toString(),Draw.class);
+                    Toast.makeText(ViewPagerActivity.this, "Date: " + d.getDate(), Toast.LENGTH_SHORT).show();
+
+                }*/
+                
+                //Draw myPOJO = gson.fromJson(dataSnapshot.getValue().toString(), Draw.class);
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+    private void connectToDatabase()
+    {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        db = database.getReference(BASE_JSON_OBJECT_KEY);
     }
 
     private void setUpCamera()
@@ -183,7 +243,6 @@ public class ViewPagerActivity extends AppCompatActivity implements TabLayout.On
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
             {
-
 
             }
 
