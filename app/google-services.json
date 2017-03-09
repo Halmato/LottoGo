@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "875416727621",
+    "firebase_url": "https://lottogo-18973.firebaseio.com",
+    "project_id": "lottogo-18973",
+    "storage_bucket": "lottogo-18973.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875416727621:android:d36f01bce4ec6c4a",
+        "android_client_info": {
+          "package_name": "com.twinc.halmato.lottogo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "875416727621-7j688k8ul9ps38fde19t2odc60893i5e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.twinc.halmato.lottogo",
+            "certificate_hash": "67f1767cda9641f073912c6e53b8bed98753951b"
+          }
+        },
+        {
+          "client_id": "875416727621-480fegnef4ucnv1g65nae17ah4dmtr5n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1CP4blhD6E_DbjfkNRMER9Bu5A47A_0Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "875416727621-480fegnef4ucnv1g65nae17ah4dmtr5n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
