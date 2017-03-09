@@ -6,29 +6,33 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+/// Singleton
 public class ViewPagerItemFragment extends Fragment
 {
-    private static final String PAGE_TITLE = "PAGE_TITLE";
+    private static final String ARGS_PAGE_TITLE = "PAGE_TITLE";
 
     private String pageTitle;
 
-    private FragmentPagerItemCallback callback;
-    private SurfaceViewFragmentSetupCompletedCallback cameraAttachedCallback;
+    private FragmentPagerItemCallback fragmentPagerItemCallback;
 
-    // Empty Constructor
-    public ViewPagerItemFragment(){
+
+    // Empty Constructor (required)
+    public ViewPagerItemFragment(){}
+
+    // Interfaces
+    public interface  FragmentPagerItemCallback {
+        void onPagerItemClick(String message);
     }
 
-    // Static method to return Fragment
-    public static ViewPagerItemFragment getInstance(String pageTitle){
+    public static ViewPagerItemFragment getInstanceOfFragment(String pageTitle){
+
         ViewPagerItemFragment fragment = new ViewPagerItemFragment();
         Bundle args = new Bundle();
-        args.putString(PAGE_TITLE, pageTitle);
+        args.putString(ARGS_PAGE_TITLE, pageTitle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -37,24 +41,22 @@ public class ViewPagerItemFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.pageTitle = getArguments().getString(PAGE_TITLE);
+            this.pageTitle = getArguments().getString(ARGS_PAGE_TITLE);
         } else {
             Log.d("TAG", "Well... F***.");
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+
         View v;
 
-        if(pageTitle=="CAMERA") {
+        if(pageTitle == "CAMERA") {
 
-            v = inflater.inflate(R.layout.camera_layout,container,false);
-            cameraAttachedCallback.surfaceViewSetupComplete(v);
+            v = inflater.inflate(R.layout.camera_layout, container, false);
 
         } else {
-
 
             v = inflater.inflate(R.layout.fragment_view_pager_item, container, false);
             TextView content = ((TextView) v.findViewById(R.id.lbl_pager_item_content));
@@ -64,7 +66,7 @@ public class ViewPagerItemFragment extends Fragment
                 @Override
                 public void onClick(View v)
                 {
-                    callback.onPagerItemClick(
+                    fragmentPagerItemCallback.onPagerItemClick(
                             ((TextView) v).getText().toString()
                     );
                 }
@@ -74,30 +76,17 @@ public class ViewPagerItemFragment extends Fragment
         return v;
     }
 
+    // Gets called first
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        try {
-            callback = (FragmentPagerItemCallback) context;
-            cameraAttachedCallback = (SurfaceViewFragmentSetupCompletedCallback) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + "must implement Callbacks");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        callback = null;
-        cameraAttachedCallback = null;
+        fragmentPagerItemCallback = null;
     }
 
-    public interface  FragmentPagerItemCallback {
-        void onPagerItemClick(String message);
-    }
 
-    public interface  SurfaceViewFragmentSetupCompletedCallback {
-        void surfaceViewSetupComplete(View rootView);
-    }
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                tools:context=".MainActivity"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
@@ -10,9 +12,37 @@
 
     <TextView
         android:id="@+id/result_text_view"
+        android:layout_alignParentBottom="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No Text"
-        android:layout_alignParentBottom="true"
         android:textColor="@android:color/white"/>
+
+    <Button
+        android:id="@+id/btn_retry_capture"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="@string/retry_image_capture"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/btn_capture_image"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/capture_image"
+        android:visibility="visible"/>
+
+    <Button
+        android:id="@+id/btn_accept_capture"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/accept_image_capture"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </RelativeLayout>

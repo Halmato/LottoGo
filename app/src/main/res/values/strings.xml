@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">LottoGo</string>
+    <string name="retry_image_capture">Retry</string>
+    <string name="capture_image">Capture</string>
+    <string name="accept_image_capture">OK</string>
 </resources>
