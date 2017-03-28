@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                tools:context=".MainActivity"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+
+    <SurfaceView
+        android:id="@+id/surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <TextView
+        android:id="@+id/result_text_view"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No Text"
+        android:textColor="@android:color/white"/>
+
+
+    <LinearLayout
+        android:id="@+id/ll_result_preview"
+        android:layout_width="wrap_content"
+        android:layout_height="150px"
+        android:layout_above="@+id/ll_camera_controls"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/result_preview_bottom_margin"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/btn_result_preview_1"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/blue_ball"
+            android:text="09" />
+
+
+        <Button
+            android:id="@+id/btn_result_preview_2"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/blue_ball"
+            android:text="09" />
+        <Button
+            android:id="@+id/btn_result_preview_3"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/blue_ball"
+            android:text="09" />
+
+        <Button
+            android:id="@+id/btn_result_preview_4"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/blue_ball"
+            android:text="09" />
+
+        <Button
+            android:id="@+id/btn_result_preview_5"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/blue_ball"
+            android:text="09" />
+
+
+        <Button
+            android:id="@+id/btn_result_preview_6"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/blue_ball"
+            android:text="09" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_camera_controls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            tools:visibility="visible"
+            android:id="@+id/btn_retry_capture"
+            android:text="@string/retry_image_capture"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"/>
+
+        <Button
+            android:id="@+id/btn_capture_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/capture_image"
+            android:visibility="visible"
+            android:layout_gravity="center_horizontal"/>
+
+        <Button
+            tools:visibility="visible"
+            android:id="@+id/btn_accept_capture"
+            android:text="@string/accept_image_capture"
+            android:visibility="invisible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"/>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

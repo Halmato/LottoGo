@@ -1,5 +1,9 @@
 package com.twinc.halmato.lottogo;
 
+import android.app.Dialog;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.Camera;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -7,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -15,6 +20,9 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.Manifest;
 import android.widget.Toast;
@@ -26,9 +34,10 @@ import com.google.android.gms.vision.text.TextRecognizer;
 import com.twinc.halmato.lottogo.model.Draw;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-import static android.R.attr.start;
-import static android.R.attr.visibility;
+import static android.R.attr.src;
+import static android.R.id.list;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -39,21 +48,19 @@ public class CameraFragment extends Fragment
 {
     private static final String TAG = "CameraFragment";
     private static final int REQUEST_CAMERA_PERMISSION_ID = 1001;
-    private static final int VISIBLE = View.VISIBLE;
-    private static final int INVISIBLE = View.INVISIBLE;
-
-    //private Context parentContext;
+    private static final int BALLS_DRAWN = 6;
 
     private Button captureImageButton, retryCaptureButton, acceptCaptureButton;
     private CameraSource cameraSource;
     private TextView resultTextView;
     private SurfaceView cameraSurfaceView;
 
+    private Button[] btnResultPreviews = new Button[BALLS_DRAWN];
+    private LinearLayout llResultPreview;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        //parentContext = context;
     }
 
     @Nullable
@@ -61,7 +68,7 @@ public class CameraFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        return inflater.inflate(R.layout.camera_layout,container,false);
+        return inflater.inflate(R.layout.fragment_camera,container,false);
 
     }
 
@@ -71,16 +78,125 @@ public class CameraFragment extends Fragment
 
         initializeComponents();
 
+        setResultDisplayButtonsOnClickListeners();
+
         setUpCamera();
+    }
+
+
+
+    private void setResultDisplayButtonsOnClickListeners() {
+
+        View.OnClickListener listener = getResultDisplayButtonOnClickListener();
+
+        for (Button btn:btnResultPreviews) {
+
+            btn.setOnClickListener(listener);
+        }
+    }
+
+    @NonNull
+    private View.OnClickListener getResultDisplayButtonOnClickListener() {
+        return new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view) {
+                Button btn = (Button)view;
+
+                displayNumberPicker(btn.getText().toString());
+            }
+        };
+    }
+
+    private void displayNumberPicker(String text) {
+
+        final Dialog d = new Dialog(getActivity());
+        //d.setTitle("NumberPicker");
+        //d.setContentView(R.layout.dialog);
+
+        // Powerball / Powerball Plus :  (5) from 45, (1) from 20
+        // Lotto / Lotto Plus : (6) from 49
+
+        d.show();
 
     }
 
-    private void setCameraButtonListeners() {
-        setCaptureButtonOnClickListener();
-        setAcceptCaptureButtonOnClickListener();
-        setRetryCaptureButtonOnClickListener();
+    private void initializeComponents() {
+
+        captureImageButton = (Button) getView().findViewById(R.id.btn_capture_image);
+        retryCaptureButton = (Button) getView().findViewById(R.id.btn_retry_capture);
+        acceptCaptureButton = (Button) getView().findViewById(R.id.btn_accept_capture);
+        cameraSurfaceView = (SurfaceView) getView().findViewById(R.id.surface_view);
+        resultTextView = (TextView) getView().findViewById(R.id.result_text_view);
+
+        llResultPreview = (LinearLayout) getView().findViewById(R.id.ll_result_preview);
+
+        btnResultPreviews[0] = (Button) getView().findViewById(R.id.btn_result_preview_1);
+        btnResultPreviews[1] = (Button) getView().findViewById(R.id.btn_result_preview_2);
+        btnResultPreviews[2] = (Button) getView().findViewById(R.id.btn_result_preview_3);
+        btnResultPreviews[3] = (Button) getView().findViewById(R.id.btn_result_preview_4);
+        btnResultPreviews[4] = (Button) getView().findViewById(R.id.btn_result_preview_5);
+        btnResultPreviews[5] = (Button) getView().findViewById(R.id.btn_result_preview_6);
     }
 
+    private void setUpCamera() {
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+
+        if (!textRecognizer.isOperational()) {
+            Log.w(TAG, "setUpCamera: Detector Dependencies are not yet available");
+        } else {
+            Toast.makeText(getApplicationContext(), "Operational ", Toast.LENGTH_SHORT).show();
+            setCameraSource(textRecognizer);
+
+            setCameraSurfaceViewCallback();
+
+            setTextRecognizerProcessor(textRecognizer);
+
+            setCameraButtonListeners();
+        }
+    }
+    private void setTextRecognizerProcessor(TextRecognizer textRecognizer) {
+
+        textRecognizer.setProcessor(new Detector.Processor<TextBlock>()
+        {
+            @Override
+            public void release() {
+            }
+
+            @Override
+            public void receiveDetections(Detector.Detections<TextBlock> detections)
+            {
+                final SparseArray<TextBlock> items = detections.getDetectedItems();
+                if(items.size() != 0) {
+                    resultTextView.post(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            StringBuilder stringBuilder = new StringBuilder();
+                            for (int i = 0; i < items.size(); i++) {
+                                TextBlock item = items.valueAt(i);
+                                stringBuilder.append(item.getValue());
+                                stringBuilder.append("\n");
+                            }
+
+                            resultTextView.setText(stringBuilder.toString());
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void captureImage() {
+
+        hideCaptureButton();
+        showRetryButton();
+        showAcceptButton();
+
+        stopCamera();
+        displayCapturedResults();
+    }
     private void retryCapture() {
 
         hideRetryButton();
@@ -90,17 +206,83 @@ public class CameraFragment extends Fragment
         startCamera();
     }
 
+    private void displayCapturedResults() {
 
-    private void initializeComponents()
-    {
-        captureImageButton = (Button) getView().findViewById(R.id.btn_capture_image);
-        retryCaptureButton = (Button) getView().findViewById(R.id.btn_retry_capture);
-        acceptCaptureButton = (Button) getView().findViewById(R.id.btn_accept_capture);
-        cameraSurfaceView = (SurfaceView) getView().findViewById(R.id.surface_view);
-        resultTextView = (TextView) getView().findViewById(R.id.result_text_view);
+        String results = getCapturedResultString();
+
+        String[] listOfNumbers = parseResults(results);
+
+        assignNumberSelectionsToBallsDisplays(listOfNumbers);
     }
 
+    private void hideResultPreviewButtons() {
 
+        llResultPreview.setVisibility(View.INVISIBLE);
+    }
+
+    private void showResultPreviewButtons() {
+
+        llResultPreview.setVisibility(View.VISIBLE);
+    }
+
+    private void assignNumberSelectionsToBallsDisplays(String[] numbers) {
+
+        for (int i = 0; i < numbers.length; i++) {
+
+            btnResultPreviews[i].setText(numbers[i]);
+        }
+    }
+
+    private String[] parseResults(String results) {
+
+        ArrayList<String> resultsList = new ArrayList<>(BALLS_DRAWN);
+
+        for(int i = 0; i < results.length(); i += 2) {
+            resultsList.add(results.substring(i, (i+2 > results.length()) ? results.length() : i+2));
+        }
+
+        return resultsList.toArray(new String[] {});
+    }
+
+    private void startCamera() {
+
+       if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+           requestPermissions(new String[]{Manifest.permission.CAMERA},REQUEST_CAMERA_PERMISSION_ID);
+            return;
+        }
+
+        try {
+            hideResultPreviewButtons();
+            cameraSource.start(cameraSurfaceView.getHolder());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void stopCamera()
+    {
+        showResultPreviewButtons();
+        cameraSource.stop();
+    }
+
+    private void onAcceptCaptureButton() {
+
+        if(isMainActivity()) {
+
+            sendDrawToMainActivity();
+        }
+    }
+
+    private void sendDrawToMainActivity() {
+        Draw draw = new Draw(getCapturedResultString());
+        ((MainActivity) getActivity()).onReceiveResultsFromCamera(draw);
+    }
+
+    private void setCameraButtonListeners() {
+        setCaptureButtonOnClickListener();
+        setAcceptCaptureButtonOnClickListener();
+        setRetryCaptureButtonOnClickListener();
+    }
     private void setRetryCaptureButtonOnClickListener() {
 
         retryCaptureButton.setOnClickListener(new View.OnClickListener()
@@ -136,16 +318,6 @@ public class CameraFragment extends Fragment
 
     }
 
-    public void captureImage() {
-        
-        hideCaptureButton();
-        showRetryButton();
-        showAcceptButton();
-
-        stopCamera();
-        displayCapturedResults();
-    }
-
     private void showAcceptButton() {
         acceptCaptureButton.setVisibility(View.VISIBLE);
     }
@@ -169,61 +341,15 @@ public class CameraFragment extends Fragment
         captureImageButton.setVisibility(View.INVISIBLE);
     }
 
-    private void setUpCamera() {
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
-
-        if (!textRecognizer.isOperational()) {
-            Log.w(TAG, "setUpCamera: Detector Dependencies are not yet available");
-        } else {
-
-            setCameraSource(textRecognizer);
-
-            setCameraSurfaceViewCallback();
-
-            setTextRecognizerProcessor(textRecognizer);
-
-            setCameraButtonListeners();
-        }
-    }
-
-    private void setTextRecognizerProcessor(TextRecognizer textRecognizer) {
-        textRecognizer.setProcessor(new Detector.Processor<TextBlock>()
-        {
-            @Override
-            public void release() {
-            }
-
-            @Override
-            public void receiveDetections(Detector.Detections<TextBlock> detections)
-            {
-                final SparseArray<TextBlock> items = detections.getDetectedItems();
-                if(items.size() != 0) {
-                    resultTextView.post(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            StringBuilder stringBuilder = new StringBuilder();
-                            for (int i = 0; i < items.size(); i++) {
-                                TextBlock item = items.valueAt(i);
-                                stringBuilder.append(item.getValue());
-                                stringBuilder.append("\n");
-                            }
-
-                            resultTextView.setText(stringBuilder.toString());
-
-                            //createDrawFromString(resultTextView.getText().toString());
-                        }
-                    });
-                }
-            }
-        });
-    }
-
     private void setCameraSource(TextRecognizer textRecognizer) {
-        cameraSource = createCameraSource(textRecognizer);
-    }
+        cameraSource = new CameraSource.Builder(getApplicationContext(), textRecognizer)
+                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setRequestedPreviewSize(1280, 1024)
+                .setAutoFocusEnabled(true)
+                .build();
 
+        Toast.makeText(getApplicationContext(), "Built ", Toast.LENGTH_SHORT).show();
+    }
     private void setCameraSurfaceViewCallback() {
         cameraSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback()
         {
@@ -247,40 +373,8 @@ public class CameraFragment extends Fragment
         });
     }
 
-    private CameraSource createCameraSource(TextRecognizer textRecognizer) {
-         return new CameraSource.Builder(getApplicationContext(), textRecognizer)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
-                .setRequestedPreviewSize(1280, 1024)
-                .setAutoFocusEnabled(true)
-                .build();
-    }
-
-    private void startCamera() {
-        if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-
-        try {
-            cameraSource.start(cameraSurfaceView.getHolder());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private void stopCamera()
-    {
-        cameraSource.stop();
-    }
-
-    private void displayCapturedResults() {
-
-        Toast.makeText(getContext(), "Displaying captured results!", Toast.LENGTH_LONG).show();
-
-    }
-
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CAMERA_PERMISSION_ID: {
                 if (requestIsGranted(grantResults[0])) {
@@ -289,33 +383,16 @@ public class CameraFragment extends Fragment
             }
         }
     }
-
-    private boolean requestIsGranted(int grantResult)
-    {
+    private boolean requestIsGranted(int grantResult) {
         return grantResult == PackageManager.PERMISSION_GRANTED;
     }
-
-    private void onAcceptCaptureButton() {
-        
-        if(isMainActivity()) {
-
-            sendDrawToMainActivity();
-        }
-    }
-
     private boolean isMainActivity()
     {
         return getActivity() instanceof MainActivity;
     }
 
-    private void sendDrawToMainActivity() {
-        Draw draw = new Draw(getCapturedResult());
-        ((MainActivity) getActivity()).onReceiveResultsFromCamera(draw);
+    private String getCapturedResultString() {
+        // TODO: 3/9/2017
+        return "010509111564";
     }
-
-    private String getCapturedResult() {
-        // TODO: 3/9/2017  
-        return "1-5-9-17-55-19";
-    }
-
 }
