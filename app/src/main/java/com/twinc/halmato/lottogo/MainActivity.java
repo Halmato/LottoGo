@@ -3,14 +3,15 @@ package com.twinc.halmato.lottogo;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -20,7 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.twinc.halmato.lottogo.model.Draw;
+import com.twinc.halmato.lottogo.model.DrawResultModel;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -30,12 +31,11 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
         ViewPagerItemFragment.FragmentPagerItemCallback
 {
-    private static final String KEY_DRAWS_LIST = "KEY_DRAWS_LIST";
-    private static final String TAG = "ViewPagerActivity";
-    private static final String ROOT_JSON_OBJECT_KEY = "draws";
-    private static final String[] PAGE_TITLES = {"CAMERA", "Music", "Podcasts", "Other"};
 
-    private static final int CAMERA_FRAGMENT_POSITION = 0;
+    private static final String KEY_DRAW_RESULTS_LIST = "KEY_DRAWS_LIST";
+    private static final String TAG = "MainActivity";
+    private static final String ROOT_JSON_OBJECT_KEY = "draws";
+
     private static final int MAIN_FRAGMENT_POSITION = 1;
 
     private TabLayout tabLayout;
@@ -43,10 +43,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     private SharedPreferences sharedPreferences;
     private DatabaseReference db;
-    private List<Draw> drawsList = new ArrayList<>();
+    private List<DrawResultModel> drawResultsList = new ArrayList<>();
 
 
-    public void onReceiveResultsFromCamera(Draw result) {
+
+
+    public void onReceiveResultsFromCamera(DrawResultModel result) {
 
         showMainFragment();
 
@@ -54,9 +56,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     }
 
-    private void createDrawLineItem(Draw result) {
+    private void createDrawLineItem(DrawResultModel result) {
 
-        Toast.makeText(this, "Draw Result: " + result.getResult() + "\n  - "+result.getDate(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Draw Result: " + result.getResultAsString() + "\n  - "+result.getDate(), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -69,7 +71,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         initializeComponents();
 
         setupSupportActionBar();
-        setupDatabase();
+
+        connectToDatabase();
+        getLatestDrawFromDatabase();
+
         setupPagerAndTabs();
 
         getDrawsListFromSharedPreferences();
@@ -77,27 +82,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
 
 
-    private void saveDrawsListToSharedPreferences(ArrayList<Draw> drawsList) {
+
+
+    private void saveDrawResultsListToSharedPreferences(List<DrawResultModel> drawsList) {
 
         String serializedDraws = new Gson().toJson(drawsList);
 
-        sharedPreferences.edit().putString(KEY_DRAWS_LIST,serializedDraws).apply();
+        sharedPreferences.edit().putString(KEY_DRAW_RESULTS_LIST,serializedDraws).apply();
     }
 
-    private void addDrawToDrawsList(Draw draw) {
-        drawsList.add(draw);
-
-        Toast.makeText(this, "Draw captured: "+draw.getResult(), Toast.LENGTH_SHORT).show();
-    }
-
-
-
-    // Database
-
-    private void setupDatabase() {
-
-        connectToDatabase();
-        readFromDatabase();
+    private void addDrawToDrawsList(DrawResultModel draw) {
+        drawResultsList.add(draw);
     }
 
 
@@ -109,11 +104,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 ContextCompat.getColor(this, R.color.colorAccent));
         tabLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
 
-        CustomAdapter adapter = new CustomAdapter(getSupportFragmentManager());
+        CustomPagerAdapter adapter = new CustomPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(adapter);
         pager.setCurrentItem(1,false);
 
-        pager.setOffscreenPageLimit(PAGE_TITLES.length);
+        pager.setOffscreenPageLimit(adapter.getCount());
 
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
@@ -162,42 +157,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
 
-    // Fragment instantiator
-
-    public static class CustomAdapter extends FragmentPagerAdapter {
-        public CustomAdapter (FragmentManager manager){
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-
-            Fragment fragment;
-
-            if(position == CAMERA_FRAGMENT_POSITION) {
-
-                fragment = new CameraFragment();
-
-            } else {
-
-                fragment = ViewPagerItemFragment.getInstanceOfFragment(PAGE_TITLES[position]);
-            }
-
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return PAGE_TITLES.length;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position){
-            return PAGE_TITLES[position];
-        }
-    }
-
-
     // Bottom-level methods
 
     private void showMainFragment()
@@ -212,19 +171,26 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
     private void getDrawsListFromSharedPreferences() {
 
-        String drawsListJson = sharedPreferences.getString(KEY_DRAWS_LIST,"[]");
+        String drawResultsListJson = sharedPreferences.getString(KEY_DRAW_RESULTS_LIST,"[]");
 
         Gson g = new Gson();
 
-        Type type = new TypeToken<ArrayList<Draw>>(){}.getType();
+        Type type = new TypeToken<ArrayList<DrawResultModel>>(){}.getType();
 
-        drawsList = g.fromJson(drawsListJson,type);
+        drawResultsList = g.fromJson(drawResultsListJson,type);
     }
     private void connectToDatabase() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        db = database.getReference(ROOT_JSON_OBJECT_KEY);
+
+        try
+        {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            db = database.getReference(ROOT_JSON_OBJECT_KEY);
+
+        } catch (Exception e) {
+            Log.e(TAG, "connectToDatabase: Could not connect to database!");
+        }
     }
-    private void readFromDatabase() {
+    private void getLatestDrawFromDatabase() {
 
         db.addValueEventListener(new ValueEventListener() {
             @Override
@@ -234,8 +200,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
                 for (DataSnapshot snapshot:dataSnapshot.getChildren()) {
 
-                    Draw draw = gson.fromJson(snapshot.getValue().toString(),Draw.class);
+                    DrawResultModel draw = gson.fromJson(snapshot.getValue().toString(),DrawResultModel.class);
+                    addDrawToDrawsList(draw);
                 }
+
+                saveDrawResultsListToSharedPreferences(drawResultsList);
+
             }
 
             @Override
@@ -246,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         });
     }
     private void setupSupportActionBar() {
-        getSupportActionBar().setElevation(0f);
+        //getSupportActionBar().setElevation(0f);
     }
 
 }

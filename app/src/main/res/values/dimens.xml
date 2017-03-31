@@ -6,4 +6,6 @@
     <dimen name="ball_button_width">30dp</dimen>
     <dimen name="number_picker_margin">50dp</dimen>
     <dimen name="number_picker_row_margin">10dp</dimen>
+    <dimen name="margin_between_balls_in_list_view">5dp</dimen>
+    <dimen name="ball_size_in_list_view">40dp</dimen>
 </resources>

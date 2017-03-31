@@ -1,9 +1,6 @@
 package com.twinc.halmato.lottogo;
 
 import android.app.Dialog;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.hardware.Camera;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -11,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -20,9 +16,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.Manifest;
 import android.widget.Toast;
@@ -31,13 +25,11 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
-import com.twinc.halmato.lottogo.model.Draw;
+import com.twinc.halmato.lottogo.model.DrawResultModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static android.R.attr.src;
-import static android.R.id.list;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -274,7 +266,7 @@ public class CameraFragment extends Fragment
     }
 
     private void sendDrawToMainActivity() {
-        Draw draw = new Draw(getCapturedResultString());
+        DrawResultModel draw = new DrawResultModel(getCapturedResultString());
         ((MainActivity) getActivity()).onReceiveResultsFromCamera(draw);
     }
 

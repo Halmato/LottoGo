@@ -3,4 +3,5 @@
     <string name="retry_image_capture">Retry</string>
     <string name="capture_image">Capture</string>
     <string name="accept_image_capture">OK</string>
+    <string name="result_number">result_image_description</string>
 </resources>

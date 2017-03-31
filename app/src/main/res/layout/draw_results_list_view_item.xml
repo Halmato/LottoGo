@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_height="50sp"
+        android:layout_width="wrap_content"
+        tools:text="18 December 2004"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:gravity="center_horizontal"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_below="@id/tv_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"    >
+
+        <RelativeLayout
+            android:layout_height="@dimen/ball_size_in_list_view"
+            android:layout_width="@dimen/ball_size_in_list_view"
+            android:layout_margin="@dimen/margin_between_balls_in_list_view">
+
+            <ImageView
+                android:contentDescription="@string/result_number"
+                android:id="@+id/iv_ball_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/blue_ball" />
+
+            <TextView
+                android:id="@+id/tv_ball_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/iv_ball_1"
+                android:layout_alignStart="@+id/iv_ball_1"
+                android:layout_alignTop="@+id/iv_ball_1"
+                android:layout_alignRight="@+id/iv_ball_1"
+                android:layout_alignEnd="@+id/iv_ball_1"
+                android:layout_alignBottom="@+id/iv_ball_1"
+                android:layout_margin="1dp"
+                android:gravity="center"
+                tools:text="3"
+                android:textColor="#000000" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_height="@dimen/ball_size_in_list_view"
+            android:layout_width="@dimen/ball_size_in_list_view"
+            android:layout_margin="@dimen/margin_between_balls_in_list_view">
+
+            <ImageView
+                android:contentDescription="@string/result_number"
+                android:id="@+id/iv_ball_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/blue_ball" />
+
+            <TextView
+                android:id="@+id/tv_ball_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/iv_ball_2"
+                android:layout_alignStart="@+id/iv_ball_2"
+                android:layout_alignTop="@+id/iv_ball_2"
+                android:layout_alignRight="@+id/iv_ball_2"
+                android:layout_alignEnd="@+id/iv_ball_2"
+                android:layout_alignBottom="@+id/iv_ball_2"
+                android:layout_margin="1dp"
+                android:gravity="center"
+                tools:text="8"
+                android:textColor="#000000" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_height="@dimen/ball_size_in_list_view"
+            android:layout_width="@dimen/ball_size_in_list_view"
+            android:layout_margin="@dimen/margin_between_balls_in_list_view">
+
+            <ImageView
+                android:contentDescription="@string/result_number"
+                android:id="@+id/iv_ball_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/blue_ball" />
+
+            <TextView
+                android:id="@+id/tv_ball_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/iv_ball_3"
+                android:layout_alignTop="@+id/iv_ball_3"
+                android:layout_alignRight="@+id/iv_ball_3"
+                android:layout_alignBottom="@+id/iv_ball_3"
+                android:layout_margin="1dp"
+                android:gravity="center"
+                tools:text="10"
+                android:textColor="#000000" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_height="@dimen/ball_size_in_list_view"
+            android:layout_width="@dimen/ball_size_in_list_view"
+            android:layout_margin="@dimen/margin_between_balls_in_list_view">
+
+            <ImageView
+                android:contentDescription="@string/result_number"
+                android:id="@+id/iv_ball_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/blue_ball" />
+
+            <TextView
+                android:id="@+id/tv_ball_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/iv_ball_4"
+                android:layout_alignStart="@+id/iv_ball_4"
+                android:layout_alignTop="@+id/iv_ball_4"
+                android:layout_alignRight="@+id/iv_ball_4"
+                android:layout_alignEnd="@+id/iv_ball_4"
+                android:layout_alignBottom="@+id/iv_ball_4"
+                android:layout_margin="1dp"
+                android:gravity="center"
+                tools:text="22"
+                android:textColor="#000000" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_height="@dimen/ball_size_in_list_view"
+            android:layout_width="@dimen/ball_size_in_list_view"
+            android:layout_margin="@dimen/margin_between_balls_in_list_view">
+
+            <ImageView
+                android:contentDescription="@string/result_number"
+                android:id="@+id/iv_ball_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/blue_ball" />
+
+            <TextView
+                android:id="@+id/tv_ball_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/iv_ball_5"
+                android:layout_alignStart="@+id/iv_ball_5"
+                android:layout_alignTop="@+id/iv_ball_5"
+                android:layout_alignRight="@+id/iv_ball_5"
+                android:layout_alignEnd="@+id/iv_ball_5"
+                android:layout_alignBottom="@+id/iv_ball_5"
+                android:layout_margin="1dp"
+                android:gravity="center"
+                tools:text="36"
+                android:textColor="#000000" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_height="@dimen/ball_size_in_list_view"
+            android:layout_width="@dimen/ball_size_in_list_view"
+            android:layout_margin="@dimen/margin_between_balls_in_list_view">
+
+        <ImageView
+            android:contentDescription="@string/result_number"
+            android:id="@+id/iv_ball_6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/blue_ball" />
+
+        <TextView
+            android:id="@+id/tv_ball_6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/iv_ball_6"
+            android:layout_alignStart="@+id/iv_ball_6"
+            android:layout_alignTop="@+id/iv_ball_6"
+            android:layout_alignRight="@+id/iv_ball_6"
+            android:layout_alignEnd="@+id/iv_ball_6"
+            android:layout_alignBottom="@+id/iv_ball_6"
+            android:layout_margin="1dp"
+            android:gravity="center"
+            tools:text="46"
+            android:textColor="#000000" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>
