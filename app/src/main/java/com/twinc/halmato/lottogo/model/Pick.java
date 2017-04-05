@@ -5,7 +5,7 @@ package com.twinc.halmato.lottogo.model;
  * Created by Tiaan on 3/2/2017.
  */
 
-public class DrawResultModel
+public class Pick
 {
     public String getResultAsString()
     {
@@ -36,9 +36,9 @@ public class DrawResultModel
     private String[] resultArray;
 
     // Needed for Gson extraction
-    public DrawResultModel() {}
+    public Pick() {}
 
-    public DrawResultModel(String result) {
+    public Pick(String result) {
         this.date = getCurrentDate();
         this.result = result;
         this.resultArray = parseResultAsStringToArray(result);

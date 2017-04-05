@@ -11,8 +11,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class CustomPagerAdapter extends FragmentPagerAdapter
 {
     private static final int CAMERA_FRAGMENT_POSITION = 0;
-    private static final int DRAW_SELECTIONS_FRAGMENT_POSITION = 1;
-    private static final String[] PAGE_TITLES = {"CAMERA", "My Draws", "Stats"};
+    private static final int PICKS_FRAGMENT_POSITION = 1;
+    private static final String[] PAGE_TITLES = {"Camera", "My Draws", "Stats"};
 
     public CustomPagerAdapter(FragmentManager manager){
         super(manager);
@@ -27,9 +27,9 @@ public class CustomPagerAdapter extends FragmentPagerAdapter
 
             fragment = new CameraFragment();
 
-        } else if(position == DRAW_SELECTIONS_FRAGMENT_POSITION) {
+        } else if(position == PICKS_FRAGMENT_POSITION) {
 
-            fragment = new DrawSelectionsFragment();
+            fragment = new PicksFragment();
 
         } else {
 

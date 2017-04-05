@@ -5,8 +5,9 @@
                 android:layout_height="wrap_content"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:orientation="vertical"
-                android:padding="10dp"
-                android:background="?android:attr/selectableItemBackground">
+                android:padding="1dp"
+                android:background="?android:attr/selectableItemBackground"
+                >
 
     <TextView
         android:id="@+id/tv_date"
@@ -26,9 +27,10 @@
         android:layout_height="wrap_content"    >
 
         <RelativeLayout
+            android:id="@+id/rl_ball_1"
             android:layout_height="@dimen/ball_size_in_list_view"
             android:layout_width="@dimen/ball_size_in_list_view"
-            android:layout_margin="@dimen/margin_between_balls_in_list_view">
+            android:margin="@dimen/margin_between_balls_in_list_view">
 
             <ImageView
                 android:contentDescription="@string/result_number"
@@ -53,6 +55,7 @@
                 android:textColor="#000000" />
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/rl_ball_2"
             android:layout_height="@dimen/ball_size_in_list_view"
             android:layout_width="@dimen/ball_size_in_list_view"
             android:layout_margin="@dimen/margin_between_balls_in_list_view">
@@ -80,6 +83,7 @@
                 android:textColor="#000000" />
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/rl_ball_3"
             android:layout_height="@dimen/ball_size_in_list_view"
             android:layout_width="@dimen/ball_size_in_list_view"
             android:layout_margin="@dimen/margin_between_balls_in_list_view">
@@ -105,6 +109,7 @@
                 android:textColor="#000000" />
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/rl_ball_4"
             android:layout_height="@dimen/ball_size_in_list_view"
             android:layout_width="@dimen/ball_size_in_list_view"
             android:layout_margin="@dimen/margin_between_balls_in_list_view">
@@ -132,6 +137,7 @@
                 android:textColor="#000000" />
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/rl_ball_5"
             android:layout_height="@dimen/ball_size_in_list_view"
             android:layout_width="@dimen/ball_size_in_list_view"
             android:layout_margin="@dimen/margin_between_balls_in_list_view">
@@ -159,6 +165,7 @@
                 android:textColor="#000000" />
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/rl_ball_6"
             android:layout_height="@dimen/ball_size_in_list_view"
             android:layout_width="@dimen/ball_size_in_list_view"
             android:layout_margin="@dimen/margin_between_balls_in_list_view">

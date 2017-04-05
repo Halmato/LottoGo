@@ -3,15 +3,11 @@ package com.twinc.halmato.lottogo;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -21,7 +17,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.twinc.halmato.lottogo.model.DrawResultModel;
+import com.twinc.halmato.lottogo.model.Pick;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -31,78 +27,61 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
         ViewPagerItemFragment.FragmentPagerItemCallback
 {
-
-    private static final String KEY_DRAW_RESULTS_LIST = "KEY_DRAWS_LIST";
     private static final String TAG = "MainActivity";
-    private static final String ROOT_JSON_OBJECT_KEY = "draws";
-
-    private static final int MAIN_FRAGMENT_POSITION = 1;
-
+    private static final int PICKS_FRAGMENT_POSITION = 1;
     private TabLayout tabLayout;
     private ViewPager pager;
 
+    private static final String KEY_DRAW_RESULTS_LIST = "KEY_DRAWS_LIST";
+    private static final String ROOT_JSON_OBJECT_KEY = "draws";
+
     private SharedPreferences sharedPreferences;
     private DatabaseReference db;
-    private List<DrawResultModel> drawResultsList = new ArrayList<>();
 
+    private List<Pick> drawResultsList = new ArrayList<>();
 
-
-
-    public void onReceiveResultsFromCamera(DrawResultModel result) {
-
-        showMainFragment();
-
-        createDrawLineItem(result);
-
-    }
-
-    private void createDrawLineItem(DrawResultModel result) {
-
-        Toast.makeText(this, "Draw Result: " + result.getResultAsString() + "\n  - "+result.getDate(), Toast.LENGTH_SHORT).show();
-    }
+    private PicksFragment picksFragment;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_pager);
+        setContentView(R.layout.activity_main);
 
         initializeComponents();
 
-        setupSupportActionBar();
-
-        connectToDatabase();
-        getLatestDrawFromDatabase();
-
         setupPagerAndTabs();
 
-        getDrawsListFromSharedPreferences();
+        connectToDatabase();
+
+        loadLatestDraws();
     }
 
+    private void loadLatestDraws() {
 
+        if(db != null) {
+            loadLatestDrawsFromDatabase();
 
-
-
-    private void saveDrawResultsListToSharedPreferences(List<DrawResultModel> drawsList) {
-
-        String serializedDraws = new Gson().toJson(drawsList);
-
-        sharedPreferences.edit().putString(KEY_DRAW_RESULTS_LIST,serializedDraws).apply();
+        } else {
+            loadDrawsListFromSharedPreferences();
+        }
     }
 
-    private void addDrawToDrawsList(DrawResultModel draw) {
-        drawResultsList.add(draw);
+    private void initializeComponents() {
+
+        tabLayout = (TabLayout) findViewById(R.id.tbl_main_content);
+        pager = (ViewPager) findViewById(R.id.vpg_main_content);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
-
-
-    // Tabs and ViewPager
 
     private void setupPagerAndTabs(){
 
         tabLayout.setTabTextColors(ContextCompat.getColor(this, android.R.color.white),
                 ContextCompat.getColor(this, R.color.colorAccent));
         tabLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+
 
         CustomPagerAdapter adapter = new CustomPagerAdapter(getSupportFragmentManager());
         pager.setAdapter(adapter);
@@ -131,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             }
         });
 
-
         tabLayout.addOnTabSelectedListener(this);
         tabLayout.setupWithViewPager(pager);
         tabLayout.getTabAt(0).setIcon(android.R.drawable.ic_menu_camera);
@@ -156,29 +134,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         Toast.makeText(this, message + "!", Toast.LENGTH_SHORT).show();
     }
 
-
-    // Bottom-level methods
-
-    private void showMainFragment()
-    {
-        pager.setCurrentItem(MAIN_FRAGMENT_POSITION,true);
-    }
-    private void initializeComponents() {
-        tabLayout = (TabLayout) findViewById(R.id.tbl_main_content);
-        pager = (ViewPager) findViewById(R.id.vpg_main_content);
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-    }
-    private void getDrawsListFromSharedPreferences() {
-
-        String drawResultsListJson = sharedPreferences.getString(KEY_DRAW_RESULTS_LIST,"[]");
-
-        Gson g = new Gson();
-
-        Type type = new TypeToken<ArrayList<DrawResultModel>>(){}.getType();
-
-        drawResultsList = g.fromJson(drawResultsListJson,type);
-    }
     private void connectToDatabase() {
 
         try
@@ -188,9 +143,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         } catch (Exception e) {
             Log.e(TAG, "connectToDatabase: Could not connect to database!");
+
         }
     }
-    private void getLatestDrawFromDatabase() {
+
+    private void loadLatestDrawsFromDatabase() {
 
         db.addValueEventListener(new ValueEventListener() {
             @Override
@@ -200,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
                 for (DataSnapshot snapshot:dataSnapshot.getChildren()) {
 
-                    DrawResultModel draw = gson.fromJson(snapshot.getValue().toString(),DrawResultModel.class);
+                    Pick draw = gson.fromJson(snapshot.getValue().toString(),Pick.class);
                     addDrawToDrawsList(draw);
                 }
 
@@ -215,8 +172,49 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             }
         });
     }
-    private void setupSupportActionBar() {
-        //getSupportActionBar().setElevation(0f);
+
+    private void loadDrawsListFromSharedPreferences() {
+
+        String drawResultsListJson = sharedPreferences.getString(KEY_DRAW_RESULTS_LIST,"[]");
+
+        Gson g = new Gson();
+
+        Type type = new TypeToken<ArrayList<Pick>>(){}.getType();
+
+        drawResultsList = g.fromJson(drawResultsListJson,type);
     }
+
+    public void onReceivePickFromCamera(Pick result) {
+
+        showPicksFragment();
+
+        picksFragment.addPick(result);
+    }
+
+
+    private void saveDrawResultsListToSharedPreferences(List<Pick> drawsList) {
+
+        String serializedDraws = new Gson().toJson(drawsList);
+
+        sharedPreferences.edit().putString(KEY_DRAW_RESULTS_LIST,serializedDraws).apply();
+    }
+
+    private void addDrawToDrawsList(Pick draw) {
+        drawResultsList.add(draw);
+    }
+
+    private void showPicksFragment()
+    {
+        pager.setCurrentItem(PICKS_FRAGMENT_POSITION,true);
+
+    }
+
+    public void setPicksFragment(PicksFragment picksFragment) {
+        this.picksFragment = picksFragment;
+    }
+
+
+
+
 
 }

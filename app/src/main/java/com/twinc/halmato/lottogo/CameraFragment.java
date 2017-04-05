@@ -25,7 +25,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
-import com.twinc.halmato.lottogo.model.DrawResultModel;
+import com.twinc.halmato.lottogo.model.Pick;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -74,8 +74,6 @@ public class CameraFragment extends Fragment
 
         setUpCamera();
     }
-
-
 
     private void setResultDisplayButtonsOnClickListeners() {
 
@@ -266,8 +264,8 @@ public class CameraFragment extends Fragment
     }
 
     private void sendDrawToMainActivity() {
-        DrawResultModel draw = new DrawResultModel(getCapturedResultString());
-        ((MainActivity) getActivity()).onReceiveResultsFromCamera(draw);
+        Pick draw = new Pick(getCapturedResultString());
+        ((MainActivity) getActivity()).onReceivePickFromCamera(draw);
     }
 
     private void setCameraButtonListeners() {
