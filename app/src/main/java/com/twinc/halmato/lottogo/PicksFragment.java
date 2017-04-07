@@ -7,11 +7,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.twinc.halmato.lottogo.expandableList.CustomExpandableListAdapter;
+import com.twinc.halmato.lottogo.expandableList.ExpandableListDataPump;
 import com.twinc.halmato.lottogo.model.Pick;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -23,10 +30,10 @@ public class PicksFragment extends Fragment
 {
     private static final String TAG = "DrawSelectionsFragment";
 
-    ArrayList<Pick> pickList;
-    ListView listView;
-    private PicksListAdapter adapter;
-
+    CustomExpandableListAdapter adapter;
+    ExpandableListView expandableListView;
+    List<String> expandableListTitle;
+    HashMap<String, List<String>> expandableListDetail;
 
     @Override
     public void onAttach(Context context) {
@@ -45,29 +52,90 @@ public class PicksFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        registerAsPickCapturedListener();
+
+        setUpExpandableList();
+
+    }
+
+    private void registerAsPickCapturedListener() {
+        // Bad name, but whatever.
+
         if(getActivity() instanceof MainActivity) {
             ((MainActivity)getActivity()).setPicksFragment(this);
         }
-
-        initializeComponents();
-
-        setAdapter();
     }
 
     public void addPick(Pick pick) {
 
-        adapter.add(pick);
+        //expandableListDetail
     }
 
-    private void setAdapter() {
-        adapter= new PicksListAdapter(pickList,getApplicationContext());
-        listView.setAdapter(adapter);
+
+
+    private void setUpExpandableList() {
+
+        expandableListView = (ExpandableListView) getActivity().findViewById(R.id.expandableListView);
+
+        expandableListDetail = new ExpandableListDataPump().getData();
+        expandableListTitle = new ArrayList<>(expandableListDetail.keySet());
+        setAdapter(expandableListTitle, expandableListDetail);
+
+        expandableListView.setAdapter(adapter);
+
+        // example
+        adapter.addPickToCurrentPicks("RANDOM");
+        adapter.movePickFromCurrentPickToOldPicks("RANDOM");
+        // end of example
+
+        setExpandListener();
+        setCollapseListener();
+        //setOnChildClickListener();
     }
 
-    private void initializeComponents() {
+    private void setAdapter(List<String> titles, HashMap<String, List<String>> detail) {
+        adapter = new CustomExpandableListAdapter(getContext(), titles, detail);
+    }
 
-        listView = (ListView) getActivity().findViewById(R.id.myList);
-        pickList = new ArrayList<>();
+    private void setOnChildClickListener() {
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                                        int groupPosition, int childPosition, long id) {
+                /*Toast.makeText(
+                        getApplicationContext(),
+                        expandableListTitle.get(groupPosition)
+                                + " -> "
+                                + expandableListDetail.get(
+                                expandableListTitle.get(groupPosition)).get(
+                                childPosition), Toast.LENGTH_SHORT
+                ).show();*/
+                return false;
+            }
+        });
+    }
+    private void setCollapseListener() {
+        expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+
+            @Override
+            public void onGroupCollapse(int groupPosition) {
+                /*Toast.makeText(getApplicationContext(),
+                        expandableListTitle.get(groupPosition) + " List Collapsed.",
+                        Toast.LENGTH_SHORT).show();*/
+
+            }
+        });
+    }
+    private void setExpandListener() {
+        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                /*Toast.makeText(getApplicationContext(),
+                        expandableListTitle.get(groupPosition) + " List Expanded.",
+                        Toast.LENGTH_SHORT).show();*/
+            }
+        });
     }
 
 }

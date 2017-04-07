@@ -28,9 +28,7 @@ public class PicksListAdapter extends ArrayAdapter<Pick> implements View.OnClick
     // View lookup cache
     private static class ViewHolder {
 
-
         RelativeLayout[] relativeLayoutsOfBalls = new RelativeLayout[6];
-
 
         /*RelativeLayout rlBall1;
         RelativeLayout rlBall2;
@@ -51,7 +49,7 @@ public class PicksListAdapter extends ArrayAdapter<Pick> implements View.OnClick
 
     // Constructor
     public PicksListAdapter(ArrayList<Pick> data, Context context) {
-        super(context, R.layout.picks_list_view_item, data);
+        super(context, R.layout.picks_list_item, data);
         this.dataSet = data;
         this.mContext=context;
     }
@@ -93,7 +91,7 @@ public class PicksListAdapter extends ArrayAdapter<Pick> implements View.OnClick
 
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.picks_list_view_item, parent, false);
+            convertView = inflater.inflate(R.layout.picks_list_item, parent, false);
 
             setupViews(convertView, viewHolder);
 

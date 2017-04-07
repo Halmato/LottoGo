@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:orientation="vertical"
-                android:padding="1dp"
-                android:background="?android:attr/selectableItemBackground"
-                >
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="1dp"
+              android:background="?android:attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/tv_date"
@@ -30,7 +28,7 @@
             android:id="@+id/rl_ball_1"
             android:layout_height="@dimen/ball_size_in_list_view"
             android:layout_width="@dimen/ball_size_in_list_view"
-            android:margin="@dimen/margin_between_balls_in_list_view">
+           >
 
             <ImageView
                 android:contentDescription="@string/result_number"
@@ -170,32 +168,27 @@
             android:layout_width="@dimen/ball_size_in_list_view"
             android:layout_margin="@dimen/margin_between_balls_in_list_view">
 
-        <ImageView
-            android:contentDescription="@string/result_number"
-            android:id="@+id/iv_ball_6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/blue_ball" />
+            <ImageView
+                android:contentDescription="@string/result_number"
+                android:id="@+id/iv_ball_6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/blue_ball" />
 
-        <TextView
-            android:id="@+id/tv_ball_6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/iv_ball_6"
-            android:layout_alignStart="@+id/iv_ball_6"
-            android:layout_alignTop="@+id/iv_ball_6"
-            android:layout_alignRight="@+id/iv_ball_6"
-            android:layout_alignEnd="@+id/iv_ball_6"
-            android:layout_alignBottom="@+id/iv_ball_6"
-            android:layout_margin="1dp"
-            android:gravity="center"
-            tools:text="46"
-            android:textColor="#000000" />
+            <TextView
+                android:id="@+id/tv_ball_6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/iv_ball_6"
+                android:layout_alignStart="@+id/iv_ball_6"
+                android:layout_alignTop="@+id/iv_ball_6"
+                android:layout_alignRight="@+id/iv_ball_6"
+                android:layout_alignEnd="@+id/iv_ball_6"
+                android:layout_alignBottom="@+id/iv_ball_6"
+                android:layout_margin="1dp"
+                android:gravity="center"
+                tools:text="46"
+                android:textColor="#000000" />
         </RelativeLayout>
-
     </LinearLayout>
-
-
-
-
 </RelativeLayout>
