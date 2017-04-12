@@ -16,38 +16,41 @@ import android.widget.Toast;
 import com.twinc.halmato.lottogo.R;
 import com.twinc.halmato.lottogo.model.Pick;
 
-import static android.R.attr.data;
-
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
-    private List<String> expandableListTitle;
-    private HashMap<String, List<String>> expandableListDetail;
+
+    private List<String> expandableListTitle;   // Current, Old
+
+    private HashMap<String, List<Pick>> expandableListDetail; // Current { 2,3,5,6,7 }, Old {4,5,6,7,9}
 
     // Constructor
     public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
-                                       HashMap<String, List<String>> expandableListDetail) {
+                                       HashMap<String, List<Pick>> expandableListDetail) {
         this.context = context;
         this.expandableListTitle = expandableListTitle;
         this.expandableListDetail = expandableListDetail;
     }
 
 
-    public void addPickToCurrentPicks(String pick) {
+    public void addPickToCurrentPicks(Pick pick) {
         expandableListDetail.get("Current").add(pick);
+        notifyDataSetChanged();
     }
-    public void movePickFromCurrentPickToOldPicks(String pick) {
-        for (String s:expandableListDetail.get("Current")) {
-            if(s.equals(pick)) {
-                expandableListDetail.get("Old").add(s);
-                expandableListDetail.get("Current").remove(s);
+
+    public void movePickFromCurrentPickToOldPicks(Pick pick) {
+        for (Pick p:expandableListDetail.get("Current")) {
+            if (p.equals(pick)) {
+                expandableListDetail.get("Old").add(p);
+                expandableListDetail.get("Current").remove(p);
+                notifyDataSetChanged();
                 return;
             }
         }
     }
 
     @Override
-    public Object getChild(int listPosition, int expandedListPosition) {
+    public Pick getChild(int listPosition, int expandedListPosition) {
         return this.expandableListDetail.get(this.expandableListTitle.get(listPosition))
                 .get(expandedListPosition);
     }
@@ -61,14 +64,30 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int listPosition, final int expandedListPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
+        final Pick pickNumbers = (Pick) getChild(listPosition, expandedListPosition);
+
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.picks_list_item, null);
+            convertView = layoutInflater.inflate(R.layout.picks_list_item, parent,false);
         }
 
-        setupViews(convertView,new ViewHolder());
+        setupViews(convertView,new ViewHolder(),pickNumbers);
+
+
 
         return convertView;
+    }
+
+    private void populatePickItemValues(ViewHolder viewHolder, Pick pick) {
+
+        viewHolder.tvBall1.setText(pick.getResultOfBallByIndex(0));
+        viewHolder.tvBall2.setText(pick.getResultOfBallByIndex(1));
+        viewHolder.tvBall3.setText(pick.getResultOfBallByIndex(2));
+        viewHolder.tvBall4.setText(pick.getResultOfBallByIndex(3));
+        viewHolder.tvBall5.setText(pick.getResultOfBallByIndex(4));
+        viewHolder.tvBall6.setText(pick.getResultOfBallByIndex(5));
+
+        viewHolder.tvDate.setText(pick.getDate());
     }
 
     @Override
@@ -135,7 +154,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         TextView tvBall6;
     }
 
-    private void setupViews(View convertView, ViewHolder viewHolder) {
+    private void setupViews(View convertView, ViewHolder viewHolder,Pick pickNumbers) {
 
         viewHolder.relativeLayoutsOfBalls[0] = (RelativeLayout) convertView.findViewById(R.id.rl_ball_1);
         viewHolder.relativeLayoutsOfBalls[1] = (RelativeLayout) convertView.findViewById(R.id.rl_ball_2);
@@ -154,6 +173,8 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         viewHolder.tvBall6 = (TextView) convertView.findViewById(R.id.tv_ball_6);
 
         setOnClickListenerOfBallGrouping(viewHolder.relativeLayoutsOfBalls);
+
+        populatePickItemValues(viewHolder, pickNumbers);
     }
 
     private void setOnClickListenerOfBallGrouping(RelativeLayout[] rls) {

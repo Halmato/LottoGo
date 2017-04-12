@@ -1,6 +1,7 @@
 package com.twinc.halmato.lottogo;
 
 import android.app.Dialog;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -36,7 +38,7 @@ import static com.facebook.FacebookSdk.getApplicationContext;
  * Created by Tiaan on 3/8/2017.
  */
 
-public class CameraFragment extends Fragment
+public class CameraFragment extends Fragment implements LottoNumberPicker.NumberSelectedListener
 {
     private static final String TAG = "CameraFragment";
     private static final int REQUEST_CAMERA_PERMISSION_ID = 1001;
@@ -49,6 +51,9 @@ public class CameraFragment extends Fragment
 
     private Button[] btnResultPreviews = new Button[BALLS_DRAWN];
     private LinearLayout llResultPreview;
+
+    // This is ugly, but I do not know how to pass a reference through regarding the index of the button that was clicked that caused the dialog popup
+    private Button ballThatBroughtUpNumberPickerDialog;
 
     @Override
     public void onAttach(Context context) {
@@ -77,38 +82,29 @@ public class CameraFragment extends Fragment
 
     private void setResultDisplayButtonsOnClickListeners() {
 
-        View.OnClickListener listener = getResultDisplayButtonOnClickListener();
+        for (int i = 0; i < btnResultPreviews.length; i++) {
 
-        for (Button btn:btnResultPreviews) {
-
-            btn.setOnClickListener(listener);
+            btnResultPreviews[i].setOnClickListener(getResultDisplayButtonOnClickListener(i));
         }
     }
 
     @NonNull
-    private View.OnClickListener getResultDisplayButtonOnClickListener() {
+    private View.OnClickListener getResultDisplayButtonOnClickListener(final int index) {
         return new View.OnClickListener()
         {
             @Override
             public void onClick(View view) {
-                Button btn = (Button)view;
 
-                displayNumberPicker(btn.getText().toString());
+                ballThatBroughtUpNumberPickerDialog = btnResultPreviews[index];
+                displayNumberPicker();
             }
         };
     }
 
-    private void displayNumberPicker(String text) {
+    private void displayNumberPicker() {
 
-        final Dialog d = new Dialog(getActivity());
-        //d.setTitle("NumberPicker");
-        //d.setContentView(R.layout.dialog);
-
-        // Powerball / Powerball Plus :  (5) from 45, (1) from 20
-        // Lotto / Lotto Plus : (6) from 49
-
-        d.show();
-
+        DialogFragment df = new LottoNumberPicker();
+        df.show(getChildFragmentManager(), "number_picker");
     }
 
     private void initializeComponents() {
@@ -187,7 +183,7 @@ public class CameraFragment extends Fragment
         stopCamera();
         displayCapturedResults();
     }
-    private void retryCapture() {
+    private void resetCamera() {
 
         hideRetryButton();
         hideAcceptButton();
@@ -260,12 +256,25 @@ public class CameraFragment extends Fragment
         if(isMainActivity()) {
 
             sendDrawToMainActivity();
+            resetCamera();
         }
     }
 
     private void sendDrawToMainActivity() {
-        Pick draw = new Pick(getCapturedResultString());
+        Pick draw = new Pick(getFinalResultString());
         ((MainActivity) getActivity()).onReceivePickFromCamera(draw);
+    }
+
+    private String getFinalResultString() {
+
+        String result = "";
+
+        // should read the numbers from the [btnResultPreviews]
+        for (int i = 0; i < btnResultPreviews.length; i++) {
+            result += btnResultPreviews[i].getText().toString();
+        }
+
+        return result;
     }
 
     private void setCameraButtonListeners() {
@@ -279,7 +288,7 @@ public class CameraFragment extends Fragment
         {
             @Override
             public void onClick(View view) {
-                retryCapture();
+                resetCamera();
             }
 
         });
@@ -382,7 +391,16 @@ public class CameraFragment extends Fragment
     }
 
     private String getCapturedResultString() {
+
+    // This must get the results captured from the camera...not from the balls.
         // TODO: 3/9/2017
         return "010509111564";
+    }
+
+    @Override
+    public void numberPickerNumberSelected(String number) {
+
+        ballThatBroughtUpNumberPickerDialog.setText(number);
+
     }
 }

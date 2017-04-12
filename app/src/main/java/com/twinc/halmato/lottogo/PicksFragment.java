@@ -26,14 +26,14 @@ import static com.facebook.FacebookSdk.getApplicationContext;
  * Created by Tiaan on 3/31/2017.
  */
 
-public class PicksFragment extends Fragment
+public class PicksFragment extends Fragment implements LottoNumberPicker.NumberSelectedListener
 {
     private static final String TAG = "DrawSelectionsFragment";
 
     CustomExpandableListAdapter adapter;
     ExpandableListView expandableListView;
     List<String> expandableListTitle;
-    HashMap<String, List<String>> expandableListDetail;
+    HashMap<String, List<Pick>> expandableListDetail;
 
     @Override
     public void onAttach(Context context) {
@@ -68,7 +68,7 @@ public class PicksFragment extends Fragment
 
     public void addPick(Pick pick) {
 
-        //expandableListDetail
+        adapter.addPickToCurrentPicks(pick);
     }
 
 
@@ -83,17 +83,14 @@ public class PicksFragment extends Fragment
 
         expandableListView.setAdapter(adapter);
 
-        // example
-        adapter.addPickToCurrentPicks("RANDOM");
-        adapter.movePickFromCurrentPickToOldPicks("RANDOM");
-        // end of example
+        // ADD PICK?
 
         setExpandListener();
         setCollapseListener();
-        //setOnChildClickListener();
+        setOnChildClickListener();
     }
 
-    private void setAdapter(List<String> titles, HashMap<String, List<String>> detail) {
+    private void setAdapter(List<String> titles, HashMap<String, List<Pick>> detail) {
         adapter = new CustomExpandableListAdapter(getContext(), titles, detail);
     }
 
@@ -138,4 +135,8 @@ public class PicksFragment extends Fragment
         });
     }
 
+    @Override
+    public void numberPickerNumberSelected(String number) {
+        Toast.makeText(getActivity(), "Number selected: " + number, Toast.LENGTH_SHORT).show();
+    }
 }

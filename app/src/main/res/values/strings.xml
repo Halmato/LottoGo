@@ -4,4 +4,5 @@
     <string name="capture_image">Capture</string>
     <string name="accept_image_capture">OK</string>
     <string name="result_number">result_image_description</string>
+    <string name="lotto_number_picker_message">random message</string>
 </resources>

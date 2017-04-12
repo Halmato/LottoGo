@@ -10,18 +10,18 @@ import java.util.List;
 
 public class ExpandableListDataPump {
 
-    private HashMap<String, List<String>> data = new HashMap<>();
+    private HashMap<String, List<Pick>> data = new HashMap<>();
 
     // Constructor
     public ExpandableListDataPump() {
 
-        data.put("Current",new ArrayList<String>());
-        data.put("Old",new ArrayList<String>());
+        data.put("Old",new ArrayList<Pick>());
+        data.put("Current",new ArrayList<Pick>());
     }
 
 
 
-    public HashMap<String,List<String>> getData() {
+    public HashMap<String,List<Pick>> getData() {
         return data;
     }
 }
