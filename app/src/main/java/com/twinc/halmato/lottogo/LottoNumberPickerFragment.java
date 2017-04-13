@@ -18,9 +18,14 @@ import android.widget.Toast;
  * Created by Tiaan on 04/12/2017.
  */
 
-public class LottoNumberPicker extends DialogFragment
+public class LottoNumberPickerFragment extends DialogFragment
 {
     private static final String TAG = "LottoNumberPicker";
+
+    public interface NumberSelectedListener
+    {
+        void numberPickerNumberSelected(String number);
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -92,22 +97,8 @@ public class LottoNumberPicker extends DialogFragment
     public String getTextInBall(View v) {
 
         return ((Button)v).getText().toString();
-        /*ViewGroup vg = (ViewGroup) v;
-
-        String ballNumber = "";
-
-        for (int i = 0; i < vg.getChildCount(); i++) {
-            if (vg.getChildAt(i) instanceof TextView) {
-                ballNumber = ((TextView) vg.getChildAt(i)).getText().toString();
-                break;
-            }
-        }
-
-        return ballNumber;*/
     }
 
-    public interface NumberSelectedListener {
-        void numberPickerNumberSelected(String number);
-    }
+
 
 }

@@ -10,15 +10,23 @@ import java.util.List;
 
 public class ExpandableListDataPump {
 
+    public static final String PICK_LIST_TITLE_OLD = "Old";
+    public static final String PICK_LIST_TITLE_CURRENT = "Current";
+
     private HashMap<String, List<Pick>> data = new HashMap<>();
 
     // Constructor
     public ExpandableListDataPump() {
 
-        data.put("Old",new ArrayList<Pick>());
-        data.put("Current",new ArrayList<Pick>());
+        data.put(PICK_LIST_TITLE_OLD,new ArrayList<Pick>());
+        data.put(PICK_LIST_TITLE_CURRENT,new ArrayList<Pick>());
+        
+        loadDataFromSharedPreferences();
+        
     }
 
+    private void loadDataFromSharedPreferences() {
+    }
 
 
     public HashMap<String,List<Pick>> getData() {

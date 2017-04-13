@@ -1,4 +1,5 @@
 package com.twinc.halmato.lottogo.expandableList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,8 +14,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.twinc.halmato.lottogo.PicksFragment;
 import com.twinc.halmato.lottogo.R;
 import com.twinc.halmato.lottogo.model.Pick;
+
+import static android.R.attr.fragment;
+import static android.R.attr.key;
+import static java.security.AccessController.getContext;
 
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
@@ -23,6 +29,25 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     private List<String> expandableListTitle;   // Current, Old
 
     private HashMap<String, List<Pick>> expandableListDetail; // Current { 2,3,5,6,7 }, Old {4,5,6,7,9}
+
+    private HashMap<View, Pick> viewPickMap = new HashMap<>();
+
+    // View lookup cache
+    private static class ViewHolder {
+
+        RelativeLayout relativeLayoutOfPick;
+
+        RelativeLayout[] relativeLayoutsOfBalls = new RelativeLayout[6];
+
+        TextView tvDate;
+
+        TextView tvBall1;
+        TextView tvBall2;
+        TextView tvBall3;
+        TextView tvBall4;
+        TextView tvBall5;
+        TextView tvBall6;
+    }
 
     // Constructor
     public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
@@ -34,19 +59,21 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
 
     public void addPickToCurrentPicks(Pick pick) {
-        expandableListDetail.get("Current").add(pick);
+
+        expandableListDetail.get(ExpandableListDataPump.PICK_LIST_TITLE_CURRENT).add(pick);
         notifyDataSetChanged();
     }
 
-    public void movePickFromCurrentPickToOldPicks(Pick pick) {
-        for (Pick p:expandableListDetail.get("Current")) {
-            if (p.equals(pick)) {
-                expandableListDetail.get("Old").add(p);
-                expandableListDetail.get("Current").remove(p);
-                notifyDataSetChanged();
-                return;
-            }
-        }
+    public void movePickFromCurrentPickToOldPicks(View view) {
+
+        Pick pick = viewPickMap.get(view);
+
+        removePickFromCurrent(pick);
+        removeOnLongClickListener(view);
+
+        expandableListDetail.get(ExpandableListDataPump.PICK_LIST_TITLE_OLD).add(pick);
+
+        notifyDataSetChanged();
     }
 
     @Override
@@ -64,7 +91,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int listPosition, final int expandedListPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
-        final Pick pickNumbers = (Pick) getChild(listPosition, expandedListPosition);
+        final Pick pickNumbers = getChild(listPosition, expandedListPosition);
 
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -72,8 +99,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         }
 
         setupViews(convertView,new ViewHolder(),pickNumbers);
-
-
 
         return convertView;
     }
@@ -112,8 +137,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int listPosition, boolean isExpanded,
-                             View convertView, ViewGroup parent) {
+    public View getGroupView(int listPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         String listTitle = (String) getGroup(listPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.
@@ -137,24 +161,11 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    private void setupViews(View convertView, ViewHolder viewHolder,Pick pick) {
 
-
-    // View lookup cache
-    private static class ViewHolder {
-
-        RelativeLayout[] relativeLayoutsOfBalls = new RelativeLayout[6];
-
-        TextView tvDate;
-
-        TextView tvBall1;
-        TextView tvBall2;
-        TextView tvBall3;
-        TextView tvBall4;
-        TextView tvBall5;
-        TextView tvBall6;
-    }
-
-    private void setupViews(View convertView, ViewHolder viewHolder,Pick pickNumbers) {
+        viewHolder.relativeLayoutOfPick = (RelativeLayout) convertView.findViewById(R.id.rl_picks_list_item);
+        setOnLongClickListenerOfPickItem(viewHolder.relativeLayoutOfPick);
+        addViewAndPickToViewPickMap(viewHolder.relativeLayoutOfPick, pick);
 
         viewHolder.relativeLayoutsOfBalls[0] = (RelativeLayout) convertView.findViewById(R.id.rl_ball_1);
         viewHolder.relativeLayoutsOfBalls[1] = (RelativeLayout) convertView.findViewById(R.id.rl_ball_2);
@@ -162,6 +173,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         viewHolder.relativeLayoutsOfBalls[3] = (RelativeLayout) convertView.findViewById(R.id.rl_ball_4);
         viewHolder.relativeLayoutsOfBalls[4] = (RelativeLayout) convertView.findViewById(R.id.rl_ball_5);
         viewHolder.relativeLayoutsOfBalls[5] = (RelativeLayout) convertView.findViewById(R.id.rl_ball_6);
+        setOnClickListenerOfBallGrouping(viewHolder.relativeLayoutsOfBalls);
 
         viewHolder.tvDate = (TextView) convertView.findViewById(R.id.tv_date);
 
@@ -172,10 +184,54 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         viewHolder.tvBall5 = (TextView) convertView.findViewById(R.id.tv_ball_5);
         viewHolder.tvBall6 = (TextView) convertView.findViewById(R.id.tv_ball_6);
 
-        setOnClickListenerOfBallGrouping(viewHolder.relativeLayoutsOfBalls);
-
-        populatePickItemValues(viewHolder, pickNumbers);
+        populatePickItemValues(viewHolder, pick);
     }
+
+    private void addViewAndPickToViewPickMap(RelativeLayout relativeLayoutOfPick, Pick pick) {
+
+        viewPickMap.put(relativeLayoutOfPick,pick);
+    }
+
+    private void removePickFromCurrent(final View key) {
+
+        expandableListDetail.get(ExpandableListDataPump.PICK_LIST_TITLE_CURRENT).remove(viewPickMap.remove(key));
+        notifyDataSetChanged();
+    }
+    private void removePickFromCurrent(final Pick value) {
+
+        expandableListDetail.get(ExpandableListDataPump.PICK_LIST_TITLE_CURRENT).remove(value);
+        viewPickMap.values().removeAll(Collections.singleton(value));
+        notifyDataSetChanged();
+    }
+    public void removePickFromCurrent(final int index) {
+
+        expandableListDetail.get(ExpandableListDataPump.PICK_LIST_TITLE_CURRENT).remove(index);
+        notifyDataSetChanged();
+    }
+
+
+    private void setOnLongClickListenerOfPickItem(RelativeLayout relativeLayoutOfPickItem) {
+
+        relativeLayoutOfPickItem.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View view) {
+
+                //removePickFromCurrent(view);
+                movePickFromCurrentPickToOldPicks(view);
+
+                return false;
+            }
+
+        });
+
+    }
+
+    private void removeOnLongClickListener(View v) {
+        v.setOnLongClickListener(null);
+    }
+
+
 
     private void setOnClickListenerOfBallGrouping(RelativeLayout[] rls) {
 

@@ -7,7 +7,12 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -24,8 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener,
-        ViewPagerItemFragment.FragmentPagerItemCallback
+public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener, ViewPagerItemFragment.FragmentPagerItemCallback
 {
     private static final String TAG = "MainActivity";
     private static final int PICKS_FRAGMENT_POSITION = 1;
@@ -41,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private List<Pick> drawResultsList = new ArrayList<>();
 
     private PicksFragment picksFragment;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

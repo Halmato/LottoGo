@@ -1,6 +1,5 @@
 package com.twinc.halmato.lottogo;
 
-import android.app.Dialog;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -38,7 +36,7 @@ import static com.facebook.FacebookSdk.getApplicationContext;
  * Created by Tiaan on 3/8/2017.
  */
 
-public class CameraFragment extends Fragment implements LottoNumberPicker.NumberSelectedListener
+public class CameraFragment extends Fragment implements LottoNumberPickerFragment.NumberSelectedListener
 {
     private static final String TAG = "CameraFragment";
     private static final int REQUEST_CAMERA_PERMISSION_ID = 1001;
@@ -103,7 +101,7 @@ public class CameraFragment extends Fragment implements LottoNumberPicker.Number
 
     private void displayNumberPicker() {
 
-        DialogFragment df = new LottoNumberPicker();
+        DialogFragment df = new LottoNumberPickerFragment();
         df.show(getChildFragmentManager(), "number_picker");
     }
 
